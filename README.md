@@ -14,6 +14,6 @@ import Differentiation
  For example,
  ```python
 f = lambda x: (np.exp(x) - 4*x)
-root, table = Newton_Raphson_Method(f, fd, x=0)
+root, table = Roots.Newton_Raphson_Method(f, fd, x=0)
 ```
 
