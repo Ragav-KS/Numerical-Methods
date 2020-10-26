@@ -1,7 +1,9 @@
 import  numpy as np
 import itertools as it
+import portion as por
 
 import LinEq
+import  Roots
 
 def DirectFitPolynomial(f, p:list):
     """Interpolation using Direct Fit Method
@@ -32,7 +34,6 @@ def DirectFitPolynomial(f, p:list):
 
 
 def LagrangePolynomial(f, P_choice :list, get_LoopFunc = False):
-    
     
     def LagrangePolynomial_LoopFunc(f, p):
         def Lagrange_fit(f, p, x):
@@ -70,3 +71,9 @@ def LagrangePolynomial(f, P_choice :list, get_LoopFunc = False):
         
     return f_L_CoeffsArray.tolist()
 
+def LinearSplineMethod(f, xi):
+    Spl = por.IntervalDict()
+    for i in range(len(xi) - 1):
+        m = (f(xi[i+1]) - f(xi[i])) / (xi[i+1] - xi[i])
+        Spl[por.closed(xi[i],xi[i+1])] = [ f(xi[i]) - m * xi[i] , m ]
+    return lambda x: Roots.Polynomial(Spl[x])(x)
