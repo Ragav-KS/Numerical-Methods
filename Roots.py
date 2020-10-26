@@ -1,7 +1,5 @@
 def Polynomial(coeff):
     def Polynomial_proto(x, coeffs):
-        coeffs = coeffs.copy()
-        # coeffs.reverse()
         o = len(coeffs)
         y = 0
         for i in range(o):
