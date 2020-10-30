@@ -49,7 +49,11 @@ def MidPointMethod(f_xy, xi, yi, h, xmax):
     return result
 
 def Butcher_Tableau(method):
-    if method == 'Midpoint':
+    if method == 'Euler':
+        C = [0]
+        A = [[0]]
+        B = [1]
+    elif method == 'Midpoint':
         C = [0, 0.5]
         A = [[0, 0], [0.5, 0]]
         B = [ 0 , 1]
@@ -57,7 +61,11 @@ def Butcher_Tableau(method):
         C = [0, 0.5, 0.5, 1]
         A = [[0, 0, 0, 0], [0.5, 0, 0, 0], [0, 0.5, 0, 0], [0, 0, 1, 0]]
         B = [ 1/6 , 1/3, 1/3, 1/6]
-    return {'s':len(C),'C': C,'A': A,'B': B}
+    elif method == '3rd Order':
+        C = [0, 1/2, 1]
+        A = [[0, 0, 0], [1/2, 0, 0], [-1, 2, 0]]
+        B = [1/6, 2/3, 1/6]
+    return {'s':len(C),'C': np.array(C),'A': np.array(A),'B': np.array(B)}
 
 def RungeKutta_General(F :list, xi :float, yi :list, h :float, xmax :float, But_t ):
     itr = int((xmax - xi)/h) + 1
@@ -66,22 +74,24 @@ def RungeKutta_General(F :list, xi :float, yi :list, h :float, xmax :float, But_
     result = {}
     yn = yi
     var = len(yn)
+    result[xi] = [*reversed(yn)]
 
-    for xn in x[:-1]:
-        hk = np.array([[np.nan]*But_t['s']] * var)
+    for n in range(itr - 1):
+        xn = x[n]
+
+        hk = np.array([[0.0]*But_t['s']] * var)
 
         # k_i
         for i in range(But_t['s']):
             xt = xn + But_t['C'][i] * h
             yt = yn.copy()
             for m in range(var):
-                for j in range(i):
-                    yt[m] = yt[m] + But_t['A'][i][j] * hk[m, j]
+                yt[m] += But_t['A'][i].dot(hk[m])
             for m in range(var):
                 hk[m, i] = h * F[m](xt, *yt)
 
         # y_{n+1}
         for i in range(var):
             yn[i] = yn[i] + np.array(But_t['B']).dot(hk[i])
-        result[xn + h] = [*reversed(yn)]
+        result[x[n+1]] = [*reversed(yn)]
     return result

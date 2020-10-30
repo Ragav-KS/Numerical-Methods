@@ -3,7 +3,7 @@ import itertools as it
 import portion as por
 
 import LinEq
-import  Roots
+import Roots
 
 def DirectFitPolynomial(f, p:list):
     """Interpolation using Direct Fit Method
