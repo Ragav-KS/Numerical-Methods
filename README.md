@@ -2,7 +2,7 @@
 Python Algorithms for numerically solving problems which are difficult to solve analytically
 
 ## How to Use
-Just import the python files in your code
+Just place the modules in your code directory import them in your code
 
 ```python
 import Roots

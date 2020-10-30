@@ -49,7 +49,7 @@ def MidPointMethod(f_xy, xi, yi, h, xmax):
     return result
 
 def Butcher_Tableau(method):
-    if method == 'midpoint':
+    if method == 'Midpoint':
         C = [0, 0.5]
         A = [[0, 0], [0.5, 0]]
         B = [ 0 , 1]
@@ -59,15 +59,18 @@ def Butcher_Tableau(method):
         B = [ 1/6 , 1/3, 1/3, 1/6]
     return {'s':len(C),'C': C,'A': A,'B': B}
 
-def RungeKutta_General(F, xi :float, yi :list, h :float, xmax :float, But_t ):
+def RungeKutta_General(F :list, xi :float, yi :list, h :float, xmax :float, But_t ):
     itr = int((xmax - xi)/h) + 1
     x = np.linspace(xi, xmax, itr)
+
     result = {}
-    yn = yi.copy()
+    yn = yi
     var = len(yn)
-    for n in range(itr - 1):
-        xn = x[n]
+
+    for xn in x[:-1]:
         hk = np.array([[np.nan]*But_t['s']] * var)
+
+        # k_i
         for i in range(But_t['s']):
             xt = xn + But_t['C'][i] * h
             yt = yn.copy()
@@ -77,7 +80,8 @@ def RungeKutta_General(F, xi :float, yi :list, h :float, xmax :float, But_t ):
             for m in range(var):
                 hk[m, i] = h * F[m](xt, *yt)
 
+        # y_{n+1}
         for i in range(var):
             yn[i] = yn[i] + np.array(But_t['B']).dot(hk[i])
-        result[x[n+1]] = [*reversed(yn)]
+        result[xn + h] = [*reversed(yn)]
     return result
