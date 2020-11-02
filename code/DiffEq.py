@@ -48,24 +48,35 @@ def MidPointMethod(f_xy, xi, yi, h, xmax):
         result[i] = {'x': x[i],'y': y}
     return result
 
-def Butcher_Tableau(method):
-
-    if method == 'Euler':
+def Butcher_Tableau(method=None):
+    if method == None:
+        Meth_list = [   'Forward Euler',
+                        'Explicit Midpoint',
+                        'Ralston',
+                        'Kutta-3rd',
+                        'Classic-4th'   ]
+        return Meth_list
+    elif method == 'Forward Euler':
         C =  [  0   ]
         A = [[  0   ]]
         B =  [  1   ]
-    elif method == 'Midpoint':
+    elif method == 'Explicit Midpoint':
         C =  [  0,      0.5 ]
         A = [[  0,      0   ],
              [  0.5,    0   ]]
         B =  [  0 ,     1   ]
-    elif method == '3rd Order':
+    elif method == 'Ralston':
+        C =  [  0,      2/3 ]
+        A = [[  0,      0   ],
+             [  2/3,    0   ]]
+        B =  [  1/4,    3/4 ]
+    elif method == 'Kutta-3rd':
         C =  [  0,      1/2,    1   ]
         A = [[  0,      0,      0   ],
              [  1/2,    0,      0   ],
              [  -1,     2,      0   ]]
         B =  [  1/6,    2/3,    1/6 ]
-    elif method == '4th Order':
+    elif method == 'Classic-4th':
         C =  [  0,      1/2,    1/2,    1   ]
         A = [[  0,      0,      0,      0   ],
              [  1/2,    0,      0,      0   ],
@@ -85,25 +96,26 @@ def RungeKutta_General(F :list, xi :float, yi :list, h :float, xmax :float, Bt )
     result = {}
     yn = yi
     var = len(yn)
-    result[xi] = [*reversed(yn)]
+    result[xi] = yn.copy()
+
+    hk = np.zeros((var,Bt['s']))
 
     for n in range(itr - 1):
         xn = x[n]
 
-        hk = np.array( [ [0.0] * Bt['s'] ] * var )
+        hk.fill(0)
 
         # k_i
         for i in range(Bt['s']):
             xt = xn + Bt['C'][i] * h
             yt = yn.copy()
 
-            for m in range(var):
-                yt[m] += Bt['A'][i].dot(hk[m])
+            yt += hk.dot(Bt['A'][i])
             for m in range(var):
                 hk[m, i] = h * F[m](xt, *yt)
 
         # y_{n+1}
         for i in range(var):
-            yn[i] = yn[i] + np.array(Bt['B']).dot(hk[i])
-        result[x[n+1]] = [*reversed(yn)]
+            yn[i] += np.array(Bt['B']).dot(hk[i])
+        result[x[n+1]] = yn.copy()
     return result
