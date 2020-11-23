@@ -19,7 +19,7 @@ def DirectFitPolynomial(f, p:list):
 
     Returns:
         List: A list of Coefficients of the Direct Fit Polynomial
-    """    
+    """
     # Coefficient Matrix
     A = np.array([[a**i for i in range(0,len(p))] for a in p])
 
@@ -32,25 +32,21 @@ def DirectFitPolynomial(f, p:list):
     # Return Coefficients
     return coeffs.tolist()
 
+def LagrangePolynomial_LoopFunc(f, p):
+    def Lagrange_fit(f, p, x):
+        n = len(p)
+        f_n = 0
+        for i in range(n):
+            L_i = 1
+            for j in range(n):
+                if i==j: continue
+                L_i = ((x - p[j])/(p[i] - p[j]))*L_i
+            f_n = f_n + L_i * f(p[i])
+        return f_n
+    return lambda x: Lagrange_fit(f, p, x)
 
-def LagrangePolynomial(f, P_choice :list, get_LoopFunc = False):
-    
-    def LagrangePolynomial_LoopFunc(f, p):
-        def Lagrange_fit(f, p, x):
-            n = len(p)
-            f_n = 0
-            for i in range(n):
-                L_i = 1
-                for j in range(n):
-                    if i==j: continue
-                    L_i = ((x - p[j])/(p[i] - p[j]))*L_i
-                f_n = f_n + L_i * f(p[i])
-            return f_n
-        return lambda x: Lagrange_fit(f, p, x)
+def LagrangePolynomial_Coeffs(f, P_choice :list):
 
-    if get_LoopFunc == True:
-        return LagrangePolynomial_LoopFunc(f, P_choice)
-        
     order = len(P_choice)
     f_L_CoeffsArray = np.array([0] * order)
     for x in range(1, order + 1):
@@ -68,7 +64,7 @@ def LagrangePolynomial(f, P_choice :list, get_LoopFunc = False):
         for i in p:
             beta = beta * (P_choice[x-1] - i)
         f_L_CoeffsArray = f_L_CoeffsArray + f(P_choice[x-1]) * f_L_t / beta
-        
+
     return f_L_CoeffsArray.tolist()
 
 def LinearSplineMethod(f, xi):
